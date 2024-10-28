@@ -1,0 +1,39 @@
+// TODO nf-core: Once you have added the required tests, please run the following command to build this file:
+// nf-core modules test segger
+nextflow_process {
+
+    name "Test Process SEGGER_PREDICT"
+    script "../main.nf"
+    process "SEGGER_PREDICT"
+
+    tag "modules"
+    tag "modules_nfcore"
+    tag "segger"
+    tag "segger/predict"
+
+    test("TODO") {
+
+        setup {
+        }
+
+        test("segger predict tiny") {
+            when {
+                process {
+                    """
+                    input[0] = [id: "test_segger"]
+                    """
+                }
+            }
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(
+                    process.out.versions,
+                    process.out.outs).match()
+                },
+                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'outputfile.bam' }).exists() },
+            )
+        }
+    }
+
+}
