@@ -11,29 +11,25 @@ nextflow_process {
     tag "segger"
     tag "segger/create_dataset"
 
-    test("TODO") {
+    test("segger create_dataset tiny") {
 
-        setup {
-        }
-
-        test("segger create_dataset tiny") {
-            when {
-                process {
-                    """
-                    input[0] = [id: "test_segger"]
-                    """
-                }
+        when {
+            process {
+                """
+                input[0] = [[id: "test_segger"], file("/data/sail/projects/tools/modules/testdata/xenium_prime_human_skin_ffpe_subset")]
+                input[1] = "xenium"
+                """
             }
-        then {
-            assertAll(
-                { assert process.success },
-                { assert snapshot(
-                    process.out.versions,
-                    process.out.outs).match()
-                },
-                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'outputfile.bam' }).exists() },
-            )
+        }
+    then {
+        assertAll(
+            { assert process.success },
+            { assert snapshot(
+                process.out.versions,
+                process.out.outs).match()
+            },
+            { assert file(process.out.dataset[0][1]).exists() },
+        )
         }
     }
-
 }

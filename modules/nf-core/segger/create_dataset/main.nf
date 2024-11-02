@@ -1,19 +1,21 @@
+params.cli_dir = "/workspace/segger_dev/src/segger/cli"
+
 process SEGGER_CREATE_DATASET {
     tag "$meta.id"
     label 'process_high'
 
     // TODO nf-core: See section in main README for further information regarding finding and adding container addresses to the section below.
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/TODO-segger':
-        'biocontainers/TODO-segger' }"
+        '/data/sail/projects/tools/modules/segger_dev_cuda121.sif' :
+        'danielunyi42/segger_dev:cuda121' }"
+    //container danielunyi42/segger_dev:cuda121
 
     input:
     tuple val(meta), path(base_dir)
-    path(data_dir)
     val(sample_type)
 
     output:
-    tuple val(meta), path("*.csv"), emit: bam
+    tuple val(meta), path("segger_dataset"), emit: dataset
     path "versions.yml"           , emit: versions
 
     when:
@@ -26,12 +28,19 @@ process SEGGER_CREATE_DATASET {
 
         def args = task.ext.args ?: ''
         def prefix = task.ext.prefix ?: "${meta.id}"
-
+        def cli_path = params.cli_dir + "/create_dataset_fast.py"
         // TODO nf-core: version number!!
+        // TODO create 'tmp' only if execution is docker, singularity or podman
         """
-        python3 src/segger/cli/create_dataset_fast.py \\
+        # set writable(!) tmp directory in bash
+        TMP_DIR=\$(mktemp -d)
+        export MPLCONFIGDIR=\$TMP_DIR
+        export NUMBA_CACHE_DIR=\$TMP_DIR
+
+        # run create_dataset
+        python3 $cli_path \\
             --base_dir $base_dir \\
-            --data_dir $data_dir \\
+            --data_dir segger_dataset \\
             --sample_type $sample_type \\
             --n_workers ${task.cpus}
             $args
