@@ -9,5 +9,11 @@ RUN git clone https://github.com/dcjones/proseg.git && \
     cd proseg/ && \
     cargo install proseg
 
-ENTRYPOINT ["/bin/bash"]
 
+# Create a non-root user for security
+RUN useradd --create-home psuser
+USER psuser
+
+
+# specify the entrypoint
+ENTRYPOINT ["/bin/bash"]
