@@ -2,7 +2,7 @@ process XENIUMRANGER_RENAME {
     tag "$meta.id"
     label 'process_high'
 
-    container "nf-core/xeniumranger:3.0.1"
+    container "nf-core/xeniumranger:3.1.1"
 
     input:
     tuple val(meta), path(xenium_bundle)
@@ -10,8 +10,8 @@ process XENIUMRANGER_RENAME {
     val(cassette_name)
 
     output:
-    tuple val(meta), path("**/outs/**"), emit: outs
-    path "versions.yml", emit: versions
+    tuple val(meta), path("${meta.id}/outs"), emit: outs
+    path("versions.yml")                    , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
