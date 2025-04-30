@@ -31,13 +31,13 @@ input:
         type: file
         description: Gene panel JSON file to use for relabeling decoded transcripts
 output:
-  - outs:
+  - bundle:
       - meta:
           type: file
           description: Files containing the outputs of Cell Ranger, see official 10X Genomics
             documentation for a complete list
           pattern: "${meta.id}/outs/*"
-      - "**/outs/**":
+      - "${meta.id}/outs":
           type: file
           description: Files containing the outputs of xenium ranger, see official 10X
             Genomics documentation for a complete list of outputs

@@ -10,7 +10,7 @@ process XENIUMRANGER_RENAME {
     val(cassette_name)
 
     output:
-    tuple val(meta), path("${meta.id}/outs"), emit: outs
+    tuple val(meta), path("${meta.id}/outs"), emit: bundle
     path("versions.yml")                    , emit: versions
 
     when:
