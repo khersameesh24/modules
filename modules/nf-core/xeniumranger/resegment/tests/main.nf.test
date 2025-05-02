@@ -9,14 +9,14 @@ nextflow_process {
     tag "modules_nfcore"
     tag "xeniumranger"
     tag "xeniumranger/resegment"
-    tag "unzip"
+    tag "untar"
 
     setup {
-            run("UNZIP") {
-                script "modules/nf-core/unzip/main.nf"
+            run("UNTAR") {
+                script "modules/nf-core/untar/main.nf"
                 process {
                     """
-                    input[0] = [[], file('https://raw.githubusercontent.com/nf-core/test-datasets/spatialxe/Xenium_Prime_Mouse_Ileum_tiny_outs.zip', checkIfExists: true)]
+                    input[0] = [[], file('https://raw.githubusercontent.com/nf-core/test-datasets/spatialxe/Xenium_Prime_Mouse_Ileum_tiny_outs.tar.gz', checkIfExists: true)]
                     """
                 }
             }
@@ -26,28 +26,23 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = Channel.of([
-                        [id: "test_xeniumranger_resegment"],
-                    ]).combine(UNZIP.out.unzipped_archive.map { it[1] })
-                input[1] = []
-                input[2] = []
-                input[3] = []
-                input[4] = []
+                input[0] = UNTAR.out.untar.map{ meta, files -> [ [ id:'test_xeniumranger_resegment' ], file(files)]}
                 """
             }
         }
         then {
+            process.out.bundle.view()
             assertAll(
                 { assert process.success },
-                { assert process.out.outs != null },
-                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'analysis_summary.html' }).exists() },
-                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'cells.csv.gz' }).exists() },
-                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'cells.parquet' }).exists() },
-                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'cells.zarr.zip' }).exists() },
-                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'transcripts.parquet' }).exists() },
-                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'transcripts.zarr.zip' }).exists() },
-                { assert file(process.out.outs.get(0).get(1).find { file(it).name == 'analysis.zarr.zip' }).exists() },
-                { assert path(process.out.outs.get(0).get(1).find { file(it).name == 'cell_feature_matrix.zarr.zip' }).exists() }
+                { assert process.out.bundle != null },
+                { assert file(process.out.bundle.get(0).get(1).find { file(it).name == 'analysis_summary.html' }).exists() },
+                { assert file(process.out.bundle.get(0).get(1).find { file(it).name == 'cells.csv.gz' }).exists() },
+                { assert file(process.out.bundle.get(0).get(1).find { file(it).name == 'cells.parquet' }).exists() },
+                { assert file(process.out.bundle.get(0).get(1).find { file(it).name == 'cells.zarr.zip' }).exists() },
+                { assert file(process.out.bundle.get(0).get(1).find { file(it).name == 'transcripts.parquet' }).exists() },
+                { assert file(process.out.bundle.get(0).get(1).find { file(it).name == 'transcripts.zarr.zip' }).exists() },
+                { assert file(process.out.bundle.get(0).get(1).find { file(it).name == 'analysis.zarr.zip' }).exists() },
+                { assert path(process.out.bundle.get(0).get(1).find { file(it).name == 'cell_feature_matrix.zarr.zip' }).exists() }
             )
         }
     }
@@ -57,13 +52,7 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = Channel.of([
-                        [id: "test_xeniumranger_resegment"],
-                    ]).combine(UNZIP.out.unzipped_archive.map { it[1] })
-                input[1] = []
-                input[2] = []
-                input[3] = []
-                input[4] = []
+                input[0] = UNTAR.out.untar.map{ meta, files -> [ [ id:'test_xeniumranger_resegment' ], file(files)]}
                 """
             }
         }
